@@ -3,8 +3,8 @@ Personal notes and code samples for the Y-combinator. I do not try to
 derive the Y-combinator or give much analysis of it. These notes are
 more "practical" and show:
 - What the Y-combinator is.
-- An example of the Y-combinator in action to get a sense for how/why
-  it works.
+- An example of the Y-combinator in action to get a sense for how/Y
+  (hehe) it works.
 
 ## Links
 - http://mvanier.livejournal.com/2897.html - Derives the Y-combinator
@@ -25,7 +25,7 @@ interpreter so download that if you want to follow along:
 ## Here we go
 Recursion is the act of defining something in terms of itself. For a
 function this means that the function calls itself as part of its
-definition. For example here is the factorial function in scheme:
+definition. For example, here is the factorial function in scheme:
 
 ```scheme
 (define factorial
@@ -46,16 +46,11 @@ Y-combinator. That is cool to me for 2 reasons:
    features but still be just as powerful. I love this minimalism. I
    love the idea of being able to do the same amount of work with less
    tools.
-2. As you program you start to think of certain constructs in a
-   language as being fundamental-truths/axioms/
-   something-that-is-necessary-to-get-anything-done. For example, when
-   first learning to program you might think of looping constructs
-   (for, while, etc...) as a necessary part of any language. Later
-   though you learn that you can just use recursion and this result
-   changes your perception on what is strictly necessary in a
-   language. I love it when a result changes my perception of the
+2. I considered a construct like `define` to be **necessary** for
+   recursion to be possible. But the Y-combinator shows that this is
+   not the case. I love it when a result changes my perception of the
    world and I especially love it when a result demonstrates that
-   something I condidered to be an "axiom" is not.
+   something I considered to be an "axiom" is not.
 
 ### High level definition of the Y-combinator
 On a high level the Y-combinator is this function:
@@ -73,8 +68,8 @@ Or in scheme:
 ```
 
 It is a function that takes a function `f` and applies `f` to the
-result of `(Y f)`. It looks a little non-sensical but when given the
-proper function `f` it creates a recursive version of `f`. So if we
+result of `(Y f)`. It looks a little nonsensical but when given the
+proper function `f` it creates a recursive version of `f`. So, if we
 are able to create some function "`almost-factorial`" then `(Y
 almost-factorial)` **is** our `factorial` function.
 
@@ -158,7 +153,7 @@ Remember that `(Y f) == (f (Y f))` and in this example `f` is `(lambda
 ```
 
 For conciseness let's label the second `(lambda (factorial) ...)` `f`.
-Rewriting the previous example we get:
+Rewriting the previous example, we get:
 
 ```scheme
 ((lambda (factorial)
@@ -208,7 +203,7 @@ really is and evaluating `(- 3 1)` the above line is really:
     2))
 ```
 
-So we are multiplying 3 times the result of:
+So, we are multiplying 3 times the result of:
 
 ```scheme
 ((Y
@@ -291,8 +286,8 @@ recursive functions such as `factorial`.
 
 ### Defining Y without recursion
 The above example is really cool but we used a `Y` that was defined
-recursively which feels a bit like cheating. So here in all its glory
-is the definition of `Y` without explicit recursion:
+recursively which feels a bit like cheating. Here in all its glory is
+the definition of `Y` without explicit recursion:
 
 ```scheme
 (lambda (f)
@@ -301,9 +296,9 @@ is the definition of `Y` without explicit recursion:
 ```
 
 The above definition is nice because it is concise and has no
-repetition but we will be using this equivalent definition (acheived
+repetition but we will be using this equivalent definition (achieved
 by invoking the `(lambda (g) (g g))`) since it requires a little less
-work to see the parallels with the high level understanding of `Y`:
+work to see the parallels with the high-level understanding of `Y`:
 
 ```scheme
 (lambda (f)
@@ -315,7 +310,7 @@ ourselves that this is indeed equivalent to our recursive
 implementation of `Y`:
 
 ```scheme
-;; Remember that this is like doing (Y fn) which should yeild (fn (Y fn))
+;; Remember that this is like doing (Y fn) which should yield (fn (Y fn))
 ((lambda (f)
    ((lambda (g) (f (g g))) (lambda (g) (f (g g)))))
  fn)
@@ -374,11 +369,11 @@ Putting everything together our factorial function sans recursion is:
 ```
 
 ### On laziness vs. strictness
-The above examples only works for a lazy implementation of scheme. If
+The above example only works for a lazy implementation of scheme. If
 it is entered into a strict implementation then when `(Y f)` is
-evaluated it will produce `f (Y f)` and, since all arguments to a
-function are evaluated before the function is applied, we'll need to
-evaluate `(Y f)` which will never end.
+evaluated it will produce `(f (Y f))` and, since all arguments are
+evaluated before the function is applied, we'll need to evaluate `(Y
+f)` which will never end.
 
 To get around this, realize that `(Y f)` for our factorial function
 produced this function of one argument:
@@ -390,14 +385,13 @@ produced this function of one argument:
    (else (* n ((Y f) (- n 1))))))
 ```
 
-So we can rewrite `(Y f)` as `(lambda (x) ((Y f) x))` since for any
+We can rewrite `(Y f)` as `(lambda (x) ((Y f) x))` since for any
 function `f` of one argument, `f` is equivalent to `(lambda (x) (f
 x))`. Delaying the evaluation of `(Y f)` by hiding it behind this
-lambda makes `Y` work for strict lanugages as well.
+lambda makes `Y` work for strict languages.
 
 With this addition, the strict version of the Y-combinator (which
-unfortunately only works for "recursive" functions of one argument)
-is:
+unfortunately, only works for functions of one argument) is:
 
 ```scheme
 (lambda (f)
@@ -405,7 +399,8 @@ is:
    (lambda (g) (f (lambda (x) ((g g) x))))))
 ```
 
-So in a strict scheme our factorial function looks like:
+With this strict compatible implementation of `Y` our factorial
+function now looks like:
 
 ```scheme
 ((lambda (f)
